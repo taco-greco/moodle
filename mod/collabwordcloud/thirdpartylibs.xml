@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<libraries>
+    <library>
+        <location>js/d3js</location>
+        <name>d3js</name>
+        <version>3</version>
+        <license>ISC</license>
+        <licenseversion>?</licenseversion>
+    </library>
+    <library>
+        <location>js/d3cloud</location>
+        <name>d3-cloud</name>
+        <version>1.2.5</version>
+        <license>BSD-3-Clause</license>
+        <licenseversion>?</licenseversion>
+    </library>
+</libraries>
