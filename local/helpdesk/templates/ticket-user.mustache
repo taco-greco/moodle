@@ -1,0 +1,223 @@
+{{!
+    This file is part of Moodle - https://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template local_helpdesk/ticket-user
+
+    Example context (json):
+    {
+        "subject": "Ticket Subject",
+        "description": "This is the description of the ticket.",
+        "ticketfiles_count": 2,
+        "ticketfiles": [
+            {
+                "fullurl": "http://example.com/file1.pdf",
+                "filename": "file1.pdf",
+                "mimetype": "application/pdf"
+            }
+        ],
+        "responses": [
+            {
+                "has_message": true,
+                "user_fullname": "John Doe",
+                "user_picture": "http://example.com/user.jpg",
+                "createdat": "2025-02-25 14:30",
+                "message": "This is the first response message.",
+                "responsefiles_count": 1,
+                "responsefiles": [
+                    {
+                        "fullurl": "http://example.com/responsefile.pdf",
+                        "filename": "responsefile.pdf",
+                        "mimetype": "application/pdf"
+                    }
+                ]
+            }
+        ],
+        "user": {
+            "phone1": "123-456-7890",
+            "phone2": "098-765-4321"
+        },
+        "idkey": "12345",
+        "course_fullname": "Course Name",
+        "user_fullname": "John Doe",
+        "user_picture": "http://example.com/user.jpg",
+        "has_closed": false,
+        "status": "open",
+        "status_translated": "Open",
+        "priority": "high",
+        "priority_translated": "High",
+        "category_translate": "General",
+        "createdat": "2025-02-20",
+        "allfiles_count": 1,
+        "allfiles": [
+            {
+                "fullurl": "http://example.com/attachment.pdf",
+                "filename": "attachment.pdf",
+                "mimetype": "application/pdf"
+            }
+        ],
+        "has_info": true,
+        "has_ticketmanage": true,
+        "status_options": [
+            { "key": "closed", "label": "Closed", "selected": "" }
+        ],
+        "priority_options": [
+            { "key": "low", "label": "Low", "selected": "" }
+        ],
+        "category_options": [
+            { "key": "technical", "label": "Technical", "selected": "" }
+        ]
+    }
+}}
+<div class="col-md-5 col-lg-4 col-xxl-3">
+    <div class="card">
+        <div class="card-header">
+            <div class="ticket-profile">
+                <div class="ticket-profile-user">
+                    <img alt="{{{user_fullname}}}" class="img-fluid " src="{{{user_picture}}}">
+                </div>
+                <div class="ml-3">
+                    <h6 class="mb-0">{{{user_fullname}}}</h6>
+                    {{#user.phone1}}
+                        <div class="text-secondary">{{{user.phone1}}}</div>
+                    {{/user.phone1}}
+                    {{^user.phone1}}
+                        {{#user.phone2}}
+                            <div class="text-secondary">{{{user.phone2}}}</div>
+                        {{/user.phone2}}
+                    {{/user.phone1}}
+                </div>
+            </div>
+        </div>
+        <div class="card-body">
+            <div id="profile-tabs" style="display: none">
+                <ul>
+                    <li><a href="#tabs-1">{{#str}}ticketid, local_helpdesk{{/str}}</a></li>
+                    <li><a href="#tabs-2">{{#str}}user{{/str}}</a></li>
+                    <li><a href="#tabs-4">{{#str}}courses{{/str}}</a></li>
+                </ul>
+                <div id="tabs-1" class="about-list pt-3">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <strong>{{#str}}ticketid, local_helpdesk{{/str}}:</strong>
+                        <span class="text-secondary">#{{{idkey}}}</span>
+                    </div>
+                    {{#course_fullname}}
+                        <div class="d-flex justify-content-between align-items-center mt-3">
+                            <strong>{{#str}}course{{/str}}:</strong>
+                            <span class="text-secondary">{{course_fullname}}</span>
+                        </div>
+                    {{/course_fullname}}
+                    {{#has_closed}}
+                        <div class="d-flex justify-content-between align-items-center mt-3">
+                            <strong>{{#str}}ticketstatus, local_helpdesk{{/str}}:</strong>
+                            <span class="badge status-{{status}}">{{status_translated}}</span>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center mt-3">
+                            <strong>{{#str}}ticketpriority, local_helpdesk{{/str}}:</strong>
+                            <span class="badge priority-{{priority}}">{{priority_translated}}</span>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center mt-3">
+                            <strong>{{#str}}ticketcategory, local_helpdesk{{/str}}:</strong>
+                            <span class="text-secondary">{{category_translate}}</span>
+                        </div>
+                    {{/has_closed}}
+                    {{^has_closed}}
+                        <div class="d-flex justify-content-between align-items-center mt-3">
+                            <strong>{{#str}}ticketstatusshort, local_helpdesk{{/str}}:</strong>
+                            {{#hasticketmanage}}
+                                <select name="changue_status"
+                                        id="changue_status"
+                                        data-column="status"
+                                        style="max-width: 138px;">
+                                    {{#status_options}}
+                                        <option value="{{key}}" {{selected}}>{{label}}</option>
+                                    {{/status_options}}
+                                </select>
+                            {{/hasticketmanage}}
+                            {{^hasticketmanage}}
+                                <span class="badge status-{{status}}">{{status_translated}}</span>
+                            {{/hasticketmanage}}
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center mt-3">
+                            <strong>{{#str}}ticketpriorityshort, local_helpdesk{{/str}}:</strong>
+
+                            {{#hasticketmanage}}
+                                <select name="changue_priority" id="changue_priority"
+                                        data-column="priority"
+                                        style="max-width: 138px;">
+                                    {{#priority_options}}
+                                        <option value="{{key}}" {{selected}}>{{label}}</option>
+                                    {{/priority_options}}
+                                </select>
+                            {{/hasticketmanage}}
+                            {{^hasticketmanage}}
+                                <span class="badge priority-{{priority}}">{{priority_translated}}</span>
+                            {{/hasticketmanage}}
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center mt-3">
+                            <strong>{{#str}}ticketcategoryshort, local_helpdesk{{/str}}:</strong>
+                            {{#hasticketmanage}}
+                                <select name="changue_category"
+                                        id="changue_category"
+                                        data-column="category"
+                                        style="max-width: 138px;">
+                                    {{#category_options}}
+                                        <option value="{{key}}" {{selected}}>{{label}}</option>
+                                    {{/category_options}}
+                                </select>
+                            {{/hasticketmanage}}
+                            {{^hasticketmanage}}
+                                <span class="text-secondary">{{category_translate}}</span>
+                            {{/hasticketmanage}}
+                        </div>
+                    {{/has_closed}}
+                    <div class="d-flex justify-content-between align-items-center mt-3">
+                        <strong>{{#str}}ticketcreatedat, local_helpdesk{{/str}}:</strong>
+                        <span class="text-secondary">{{createdat}}</span>
+                    </div>
+                    <div class="alert alert-success"
+                         style="display:none"
+                         id="local_helpdesk_ticket_column"></div>
+                </div>
+                <div id="tabs-2" class="info">
+                    {{{detail.get_user_info}}}
+                </div>
+                <div class="personalDev" id="tabs-4">
+                    {{{detail.list_courses}}}
+                </div>
+
+
+            </div>
+        </div>
+    </div>
+    <div class="card">
+        <div class="card-header">
+            <h5>{{#str}}attachment, local_helpdesk{{/str}}</h5>
+        </div>
+        {{#allfiles_count}}
+            <div class="card-body">
+                {{#allfiles}}
+                    <a class="ticket-attachments p-2 mb-2 w-100"
+                       target="_blank"
+                       href="{{fullurl}}">
+                        <p class="mb-0">{{{filename}}}</p>
+                        <p class="mb-0 text-secondary">{{{mimetype}}}</p>
+                    </a>
+                {{/allfiles}}
+            </div>
+        {{/allfiles_count}}
+    </div>
+</div>

@@ -1,0 +1,217 @@
+{{!
+    This file is part of Moodle - https://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template local_helpdesk/index
+
+    Example context (json):
+    {
+      "status_options": [
+        {
+          "key": "open",
+          "label": "Open",
+          "selected": "selected"
+        }
+      ],
+      "priority_options": [
+        {
+          "key": "high",
+          "label": "High",
+          "selected": ""
+        }
+      ],
+      "category_options": [
+        {
+          "key": "technical",
+          "label": "Technical",
+          "selected": ""
+        }
+      ],
+      "has_manage": true,
+      "has_categorymanage": true,
+      "has_siteconfig": true,
+      "tickets": [
+        {
+          "idkey": 1,
+          "user_picture": "user1.jpg",
+          "user_fullname": "John Doe",
+          "course_fullname": "Math 101",
+          "subject": "Issue with Homework Submission",
+          "status": "open",
+          "status_translated": "Open",
+          "priority": "high",
+          "priority_translated": "High",
+          "category_translate": "Technical",
+          "createdat": "2025-02-25",
+          "user_picture": "john_doe.jpg"
+        }
+      ],
+      "courseid": 123
+    }
+
+}}
+
+<form method="get">
+    <div class="area-finds mb-2">
+        <div class="area-find">
+            <label for="search">{{#str}}findticket, local_helpdesk{{/str}}: </label>
+            <input name="search" id="search" type="text"
+                   value="{{{search}}}"
+                   style="min-width: 380px;">
+        </div>
+    </div>
+    <div class="area-finds mb-2">
+        <div class="area-find">
+            <label for="find_status">{{#str}}ticketstatus, local_helpdesk{{/str}}: </label>
+            <select name="find_status" id="find_status">
+                <option value="{{empty}}">{{#str}}ticketstatusnotclosed, local_helpdesk{{/str}}</option>
+                {{#status_options}}
+                    <option value="{{key}}" {{selected}}>{{label}}</option>
+                {{/status_options}}
+            </select>
+        </div>
+
+        {{#has_manage}}
+            <div class="area-find">
+                <label for="find_priority">{{#str}}ticketpriority, local_helpdesk{{/str}}: </label>
+                <select name="find_priority" id="find_priority">
+                    <option value="{{empty}}">..:: {{#str}}selectanoptions{{/str}} ::..</option>
+                    {{#priority_options}}
+                        <option value="{{key}}" {{selected}}>{{label}}</option>
+                    {{/priority_options}}
+                </select>
+            </div>
+        {{/has_manage}}
+
+        <div class="area-find">
+            <label for="find_category">{{#str}}ticketcategory, local_helpdesk{{/str}}: </label>
+            <select name="find_category" id="find_category">
+                <option value="{{empty}}">..:: {{#str}}selectanoptions{{/str}} ::..</option>
+                {{#category_options}}
+                    <option value="{{key}}" {{selected}}>{{label}}</option>
+                {{/category_options}}
+            </select>
+        </div>
+    </div>
+    <div class="area-finds mb-2">
+        <div class="area-find">
+            {{{find_course}}}
+        </div>
+
+        {{#has_manage}}
+            <div class="area-find">
+                {{{find_user}}}
+            </div>
+        {{/has_manage}}
+        <input type="submit" value="{{#str}}search{{/str}}">
+    </div>
+</form>
+
+<table class="generaltable">
+    <thead>
+        <tr>
+            <th>&nbsp;</th>
+            <th>{{#str}}fullname{{/str}}</th>
+            <th>{{#str}}course{{/str}}</th>
+            <th>{{#str}}ticketsubject, local_helpdesk{{/str}}</th>
+            <th>{{#str}}ticketstatus, local_helpdesk{{/str}}</th>
+            <th>{{#str}}ticketpriority, local_helpdesk{{/str}}</th>
+            <th>{{#str}}ticketcategory, local_helpdesk{{/str}}</th>
+            <th>{{#str}}ticketcreatedat, local_helpdesk{{/str}}</th>
+            {{#has_manage}}
+                <th>&nbsp;</th>
+            {{/has_manage}}
+        </tr>
+    </thead>
+    <tbody>
+        {{#tickets}}
+            <tr onclick="location.href='ticket.php?id={{idkey}}'">
+                <td><img src="{{{user_picture}}}" alt="{{user_fullname}}" class="user_picture"></td>
+                <td>{{user_fullname}}</td>
+                <td>{{course_fullname}}</td>
+                <td>{{subject}}</td>
+                <td>
+                    <span class="badge status-{{status}}">{{status_translated}}</span>
+                </td>
+                <td>
+                    <span class="badge priority-{{priority}}">{{priority_translated}}</span>
+                </td>
+                <td>{{category_translate}}</td>
+                <td>{{createdat}}</td>
+                {{#has_manage}}
+                    <td onclick="event.stopImmediatePropagation()">
+                        <a href="?action=edit&amp;id={{idkey}}" class="badge badge-success">{{#str}}edit{{/str}}</a>
+                    </td>
+                {{/has_manage}}
+            </tr>
+        {{/tickets}}
+    </tbody>
+</table>
+
+<div class="control-buttons">
+    <a href="?action=add&courseid={{courseid}}"
+       class="btn btn-info text-nowrap">{{#str}}addticket, local_helpdesk{{/str}}</a>
+
+    <div style="width: 100%"></div>
+    {{#has_manage}}
+        <form method="get" action="export.php" class="d-flex align-items-center flex-wrap" style="gap: 8px;">
+            <input type="hidden" name="courseid" value="{{courseid}}">
+            <span class="font-weight-bold mr-1">{{#str}}exportstatusfilter, local_helpdesk{{/str}}:</span>
+            <label class="mb-0 mr-2"><input type="checkbox" name="export_status[]" value="open" checked id="export_cb_open"> {{#str}}status_open, local_helpdesk{{/str}}</label>
+            <label class="mb-0 mr-2"><input type="checkbox" name="export_status[]" value="closed" id="export_cb_closed"> {{#str}}status_closed, local_helpdesk{{/str}}</label>
+            <label class="mb-0 mr-2"><input type="checkbox" name="export_status[]" value="resolved" id="export_cb_resolved"> {{#str}}status_resolved, local_helpdesk{{/str}}</label>
+            <label class="mb-0 mr-2"><input type="checkbox" name="export_status[]" value="progress" id="export_cb_progress"> {{#str}}status_progress, local_helpdesk{{/str}}</label>
+            <label class="mb-0 mr-2"><input type="checkbox" name="export_status[]" value="all" id="export_cb_all"> {{#str}}status_all, local_helpdesk{{/str}}</label>
+            <button type="submit" class="btn btn-warning text-nowrap">{{#str}}exporttickets, local_helpdesk{{/str}}</button>
+        </form>
+        <script>
+            (function() {
+                var allCb = document.getElementById('export_cb_all');
+                var statusCbs = ['export_cb_open','export_cb_closed','export_cb_resolved','export_cb_progress'];
+                allCb.addEventListener('change', function() {
+                    var checked = allCb.checked;
+                    statusCbs.forEach(function(id) {
+                        document.getElementById(id).checked = checked;
+                    });
+                });
+                statusCbs.forEach(function(id) {
+                    document.getElementById(id).addEventListener('change', function() {
+                        if (!this.checked) {
+                            allCb.checked = false;
+                        } else {
+                            var allChecked = statusCbs.every(function(cbId) {
+                                return document.getElementById(cbId).checked;
+                            });
+                            allCb.checked = allChecked;
+                        }
+                    });
+                });
+            })();
+        </script>
+    {{/has_manage}}
+    {{#has_categorymanage}}
+        <a href="categories.php"
+           class="btn btn-success text-nowrap">{{#str}}categories, local_helpdesk{{/str}}</a>
+    {{/has_categorymanage}}
+    {{#has_siteconfig}}
+        <a href="/admin/settings.php?section=local_helpdesk"
+           target="_blank">
+            <img src="/theme/image.php/boost/local_helpdesk/0/settings"
+                 alt="settings"
+                 style="width: 36px;height: 36px;min-width: 36px;min-height: 36px">
+        </a>
+    {{/has_siteconfig}}
+</div>

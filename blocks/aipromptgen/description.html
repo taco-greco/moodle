@@ -1,0 +1,162 @@
+<p><a href="https://github.com/blagojevicboban/moodle-block_aipromptgen/actions/workflows/ci.yml">
+  <img class="img-fluid" src="https://github.com/blagojevicboban/moodle-block_aipromptgen/actions/workflows/ci.yml/badge.svg" alt="Moodle Plugin CI"></a> 
+  <a href="https://moodle.org/"><img class="img-fluid" src="https://camo.githubusercontent.com/3ec51fba033853103bb82ae861db2f00562e43f46ac71d5bff1aadbb2e46f8b3/68747470733a2f2f696d672e736869656c64732e696f2f62616467652f4d6f6f646c652d342e31253230746f253230352e312d6f72616e67652e737667" alt="Moodle"></a><span>&nbsp;</span><a href="https://php.net/"><img class="img-fluid" src="https://camo.githubusercontent.com/fb7c72456e13f7d5ecf8486e29d02a2e6775aaf4d18622a63529976b0ed0740e/68747470733a2f2f696d672e736869656c64732e696f2f62616467652f5048502d382e312532422d707572706c652e737667" alt="PHP"></a><span>&nbsp;</span><a href="https://github.com/blagojevicboban/moodle-block_aipromptgen/blob/main/LICENSE"><img class="img-fluid" src="https://camo.githubusercontent.com/1b0c7e4911720d0444c16a1ffd145a039f14a1a7305362ab51184f757a4dd6bc/68747470733a2f2f696d672e736869656c64732e696f2f62616467652f4c6963656e73652d47504c25323076332d626c75652e737667" alt="License"></a></p>
+
+<p>Empower your teachers with a dedicated, course-aware AI prompt builder! The
+  <strong>AI for Teachers</strong> block allows educators to quickly generate
+  highly structured, context-rich instructional prompts directly within their
+  Moodle courses without needing to be "prompt engineers."</p>
+<p>By connecting directly to your course data, the builder eliminates the need
+  to manually type out redundant details. Teachers can use intuitive "Browse"
+  buttons to instantly pull in course sections, learning competencies, and
+  gradebook outcomes. The result? Highly accurate, ready-to-use prompts for
+  creating lesson plans, quizzes, rubrics, and student activities.</p>
+<h3>✨ Key Features</h3>
+<ul>
+  <li><strong>Course-Aware Context:</strong> The builder automatically prefills
+    the subject name and provides "Browse" modals to seamlessly insert your
+    specific Moodle course sections, activities, learning plan competencies, and
+    gradebook outcomes.</li>
+  <li><strong>Real-Time Generation:</strong> As you select options or type
+    (Student age, Class type, Audience, Language, etc.), the prompt updates
+    instantly and natively.</li>
+  <li><strong>Multi-Provider AI Integration:</strong> Connect your institution's
+    preferred AI provider to seamlessly send prompts and receive responses
+    without ever leaving Moodle. Currently supports:
+    <ul>
+      <li><strong>OpenAI</strong> (ChatGPT)</li>
+      <li><strong>Google Gemini</strong></li>
+      <li><strong>Anthropic Claude</strong></li>
+      <li><strong>DeepSeek</strong></li>
+      <li><strong>Custom OpenAI-compatible API</strong> (Any provider using the OpenAI standard!)</li>
+      <li><strong>Ollama</strong> (Run local models on your own server for total data privacy!)</li>
+    </ul>
+  </li>
+  <li><strong>Quick Templates:</strong> Admins can define custom JSON-based
+    prompt templates with placeholders (like {topic}, {audience}) for one-click
+    highly specialized generation.</li>
+  <li><strong>Advanced Response Viewer:</strong> AI responses are returned in a
+    beautifully formatted modal with 4 distinct view modes: <strong>Rich
+      HTML</strong> (rendered), <strong>Text</strong>, <strong>Raw
+      Markdown</strong>, and <strong>HTML Code</strong>.</li>
+  <li><strong>Smart "Copy" functionality:</strong> One-click copy preserves Rich
+    Text formatting (like bullet points, bold text, and headers) so it pastes
+    perfectly into Microsoft Word, Google Docs, or your Moodle text editor.</li>
+  <li><strong>Teacher-Only Access:</strong> Safely restricted to users with
+    editing capabilities (editing teachers and managers by default)—students
+    cannot access the block.</li>
+</ul>
+
+<hr>
+<h3>Custom Templates (JSON)</h3>
+<p>You can define your own prompt templates that appear in the dropdown menu.
+  Use placeholders like <code>{subject}</code>, <code>{topic}</code>,
+  <code>{lesson}</code>, <code>{audience}</code>,
+  <code>{outcomes}</code>.</p>
+
+<h4>Example 1: Simple JSON</h4>
+<pre><code>[
+  {
+    "title": "Glossary",
+    "prompt": "Create a list of 10 key terms for {subject}, topic: {topic}. Audience: {audience}."
+  },
+  {
+    "title": "Quick Quiz",
+    "prompt": "Create a multiple choice quiz (5 questions) for these outcomes: {outcomes}."
+  }
+]</code></pre>
+
+<h4>Example 2: Complex JSON (Pedagogical Plan)</h4>
+<p>Use <code>\\n</code> for new lines.</p>
+<pre><code>[
+  {
+    "title": "Detailed Lesson Plan",
+    "prompt": "Write a 5E lesson plan for {subject}.\\n\\nTopic: {topic}\\nOutcomes: {outcomes}"
+  }
+]</code></pre>
+
+<hr>
+
+<h3>Prilagođeni šabloni (JSON) - Srpski</h3>
+<p>Možete definisati sopstvene šablone koji se pojavljuju u padajućem meniju.
+  Koristite placeholder-e kao što su <code>{subject}</code>,
+  <code>{topic}</code>, <code>{lesson}</code>, <code>{audience}</code>,
+  <code>{outcomes}</code>.</p>
+
+<h4>Primer 1: Jednostavan JSON (Kopiraj ovo za testiranje)</h4>
+<p>Ovo uvodi tri nova šablona u padajući meni: Listu pojmova, Brzi kviz i Osnovu za debatu.</p>
+
+<pre><code>[
+  {
+    "title": "Glosar pojmova",
+    "prompt": "Kreiraj listu od 10 ključnih pojmova i njihovih definicija za predmet {subject}, a konkretno za temu: {topic}. Objašnjenja moraju biti prilagođena uzrastu: {audience}."
+  },
+  {
+    "title": "Brzi test (Multiple Choice)",
+    "prompt": "Napravi kratak test višestrukog izbora (5 pitanja, svako sa 4 ponuđena odgovora i označenim tačnim rešenjem) koji pokriva sledeće ishode učenja: {outcomes}."
+  },
+  {
+    "title": "Tema za debatu",
+    "prompt": "Na osnovu lekcije '{lesson}', osmisli jednu provokativnu tvrdnju za debatu u učionici. Napiši po tri jake teze 'ZA' i tri teze 'PROTIV'."
+  }
+]</code></pre>
+
+<h4>💡 Primer 2: Napredni, kompleksni JSON (Kompletan pedagoški plan)</h4>
+<p>U ovom primeru prikazujemo kako se koristi <code>\\n</code> za pravljenje novih redova unutar prompta
+  kako bi instruisali AI da napravi kompleksniji dokument.</p>
+
+<pre><code>[
+  {
+    "title": "Detaljan plan časa (5ES model)",
+    "prompt": "Kao stručnjak za metodiku nastave, napiši detaljan plan časa za predmet {subject} koristeći 5E model (Engage, Explore, Explain, Elaborate, Evaluate).\\n\\nTema: {topic}\\nLekcija: {lesson}\\nUzrast: {audience}\\nCiljevi: {outcomes}\\nTip časa: {style}\\nJezik za generisanje: {language}\\n\\nPlan treba da sadrži vremensku raspodelu za čas od 45 minuta i konkretne instrukcije za svaku od 5E faza."
+  },
+  {
+    "title": "Diferencirani zadaci (3 nivoa težine)",
+    "prompt": "Kreiraj set vežbanja za temu '{topic}' (Lekcija: {lesson}), dizajniran za uzrast '{audience}'.\\nZahtevam 3 zadatka:\\n1. Osnovni nivo (reprodukcija znanja)\\n2. Srednji nivo (primena na novom primeru)\\n3. Napredni nivo (kritičko razmišljanje ili kreiranje nečeg novog)\\n\\nFokusiraj se pre svega na ostvarivanje ovog ishoda: {outcomes}"
+  }
+]</code></pre>
+
+<p><strong>Šta se dešava u praksi?</strong><br>
+Ako administrator kopira ovaj drugi primer u polje
+<strong>Predefined templates (JSON)</strong> i sačuva postavke, nastavnik će videti
+"Detaljan plan časa (5ES model)" u dropdown-u.</p>
+
+<p>Ako nastavnik prethodno unese "Biologija" u polje <strong>Predmet</strong> i
+klikne na ovaj šablon, <code>textarea</code> za prompt će se trenutno osvežiti i
+<code>{subject}</code> će zameniti rečju "Biologija". Nastavnik onda samo pritisne
+<strong>"Send to AI"</strong> – štedeći sebi kucanje složenih struktura!</p>
+<hr>
+<h3>🔗 Pair it with our TinyMCE Editor Plugin!</h3>
+<p>Are you looking for a quick AI shortcut directly inside your Moodle text
+  editor for on-the-fly content generation?</p>
+<p>Be sure to check out our companion plugin: <strong><a
+      href="https://moodle.org/plugins/tiny_aipromptgen" target="_blank"
+      rel="noreferrer noopener">Tiny AI Prompt Generator</a></strong>! It brings
+  powerful AI capabilities directly into the standard Moodle TinyMCE toolbar.
+</p>
+<hr>
+<h3>⚙️ Setup &amp; Configuration</h3>
+<ol>
+  <li>Install the plugin from the Moodle Plugins directory or place the folder
+    in <code>blocks/aipromptgen</code>.</li>
+  <li>Add the block to any course page or the Teacher Dashboard.</li>
+  <li><strong>Optional:</strong> To enable the "Send to AI" functionality, enter
+    your API keys (or your local Ollama endpoint) by navigating to <em>Site
+      administration → Plugins → Blocks → AI for Teachers</em>.</li>
+</ol>
+<p>The plugin is a product of Erasmus project:<br>KA220-VET - Cooperation
+  partnerships in vocational education and training<br>Project Title: AI tools
+  for VET schools<br><span lang="en-gb"
+    style="font-size: 14pt; line-height: 130%; font-family: Verdana, sans-serif; color: #808080; letter-spacing: 0.8pt;"
+    xml:lang="en-gb"></span><span lang="en-gb"
+    style="font-size: 14pt; line-height: 130%; font-family: Verdana, sans-serif; color: #808080; letter-spacing: 0.8pt;"
+    xml:lang="en-gb"></span></p>
+<p>© 2025 AI4Teachers | <a href="https://github.com/blagojevicboban">Boban
+    Blagojević</a></p>
+<ul>
+  <li style="list-style-type: none;">
+    <ul>
+      <li style="list-style-type: none;"> </li>
+    </ul>
+  </li>
+</ul>

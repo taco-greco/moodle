@@ -1,0 +1,307 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template block_aipromptgen/prompt_page
+
+    Main page template for the AI Prompt Generator.
+
+    Classes required for JS:
+    * .ai4t-generated-wrapper
+    * .ai4t-actions
+    * .ai4t-modal
+
+    Data attributes required for JS:
+    * data-courseid
+    * data-provider
+
+    Context variables required for this template:
+    * hasgenerated - bool, true if prompt was generated
+    * generatedprompt - string, the generated text
+    * provideroptions - array of {value, label, selected}
+    * backurl - string, URL to course
+    * providersavailable - bool
+    * sesskey - string
+    * courseid - int
+    * lessonoptions - array
+    * topics - array
+    * competencies - array
+    * languages - array
+    * purposes - array
+    * audiences - array
+    * classtypes - array
+    * airesponse_initial - string
+
+    Example context (json):
+    {
+        "hasgenerated": true,
+        "courseid": 2,
+        "sesskey": "sesskey",
+        "generatedprompt": "Test prompt",
+        "provideroptions": [
+            {"value": "openai", "label": "OpenAI", "selected": true},
+            {"value": "ollama", "label": "Ollama (Local)"}
+        ],
+        "providersavailable": true,
+        "backurl": "#",
+        "lessonoptions": [],
+        "topics": [],
+        "competencies": ["Competency 1"],
+        "languages": [{"code": "en", "name": "English", "label": "English"}],
+        "purposes": ["Teaching"],
+        "audiences": ["Students"],
+        "classtypes": ["Online"],
+        "airesponse_initial": ""
+    }
+}}
+
+<!-- Generated Prompt Section -->
+{{#hasgenerated}}
+<div class="ai4t-generated-wrapper" id="ai4t-generated-wrapper" style="margin-top:24px;">
+    <h3>{{#str}}form:result, block_aipromptgen{{/str}}</h3>
+    
+    <form method="post" action="view.php" id="ai4t-send-form">
+        <input type="hidden" name="courseid" value="{{courseid}}">
+        <input type="hidden" name="sesskey" value="{{sesskey}}">
+        <input type="hidden" name="sendto" id="ai4t-sendto">
+        
+        <textarea id="ai4t-generated" name="ai4t_generated" rows="12" class="form-control" style="width:100%;" title="{{#str}}tooltip:editprompt, block_aipromptgen{{/str}}">{{generatedprompt}}</textarea>
+        <br>
+        
+        <div class="ai4t-actions">
+            <button type="button" id="ai4t-copy" class="btn btn-secondary">{{#str}}form:copy, block_aipromptgen{{/str}}</button>
+            
+            <select id="ai4t-provider" class="custom-select" style="width:auto;display:inline-block;margin-left:12px;">
+                {{#provideroptions}}
+                    <option value="{{value}}" {{#selected}}selected{{/selected}}>{{label}}</option>
+                {{/provideroptions}}
+            </select>
+    
+            <button type="button" id="ai4t-sendtoai" class="btn btn-primary" style="margin-left:8px;" {{^providersavailable}}disabled title="{{#str}}tooltip:provider_not_configured, block_aipromptgen{{/str}}"{{/providersavailable}}>
+                {{#str}}form:sendtoai, block_aipromptgen{{/str}}
+            </button>
+            
+            <span id="ai4t-copied" style="margin-left:8px;display:none;"></span>
+            <span id="ai-response-status" style="margin-left:8px;font-style:italic;color:#666;"></span>
+        </div>
+    </form>
+
+    <!-- AI Response Placeholder -->
+    <div id="ai4t-airesponse" style="margin-top:16px;"></div>
+</div>
+{{/hasgenerated}}
+
+<!-- Modals -->
+<div class="ai4t-modal-backdrop" id="ai4t-modal-backdrop" style="display:none;"></div>
+
+<!-- Age Modal -->
+<div class="ai4t-modal" id="ai4t-age-modal" role="dialog" aria-modal="true" aria-labelledby="ai4t-age-modal-title" style="display:none;">
+    <header>
+        <h3 id="ai4t-age-modal-title">{{#str}}form:agerangelabel, block_aipromptgen{{/str}}</h3>
+        <button type="button" id="ai4t-age-modal-close" class="btn btn-link" aria-label="{{#str}}cancel{{/str}}">&times;</button>
+    </header>
+    <div class="ai4t-body">
+        <div class="mb-2">
+            <div style="display:flex;align-items:center;gap:8px;">
+                <input type="radio" name="ai4t-age-mode" id="ai4t-age-mode-exact" value="exact" checked>
+                <label for="ai4t-age-mode-exact" class="mb-0">Exact age</label>
+                <input type="number" id="ai4t-age-exact" min="1" max="120" step="1" style="width:100px;" class="form-control d-inline" aria-label="Exact age value">
+            </div>
+        </div>
+        <div>
+            <div style="display:flex;align-items:center;gap:8px;">
+                <input type="radio" name="ai4t-age-mode" id="ai4t-age-mode-range" value="range">
+                <label for="ai4t-age-mode-range" class="mb-0">Age range</label>
+                <input type="number" id="ai4t-age-from" min="1" max="120" step="1" style="width:100px;" class="form-control d-inline" disabled aria-label="Age range from">
+                <span>–</span>
+                <input type="number" id="ai4t-age-to" min="1" max="120" step="1" style="width:100px;" class="form-control d-inline" disabled aria-label="Age range to">
+            </div>
+        </div>
+    </div>
+    <footer>
+        <button type="button" class="btn btn-primary" id="ai4t-age-modal-insert">{{#str}}add{{/str}}</button>
+        <button type="button" class="btn btn-secondary" id="ai4t-age-modal-cancel">{{#str}}cancel{{/str}}</button>
+    </footer>
+</div>
+
+<!-- Lesson Modal (Course Modules) -->
+<div class="ai4t-modal" id="ai4t-modal" role="dialog" aria-modal="true" aria-labelledby="ai4t-modal-title" style="display:none;">
+    <header>
+        <h3 id="ai4t-modal-title">{{#str}}form:lessonlabel, block_aipromptgen{{/str}}</h3>
+        <button type="button" id="ai4t-modal-close" class="btn btn-link" aria-label="{{#str}}cancel{{/str}}">&times;</button>
+    </header>
+    <div class="ai4t-body">
+        <ul class="ai4t-list">
+            {{#lessonoptions}}
+                {{#text}}<li class="ai4t-section">{{text}}</li>{{/text}}
+                {{#options}}
+                    <li class="ai4t-lesson-item" data-value="{{value}}" tabindex="0">{{label}}</li>
+                {{/options}}
+            {{/lessonoptions}}
+        </ul>
+    </div>
+    <footer>
+        <button type="button" class="btn btn-secondary" id="ai4t-modal-cancel">{{#str}}cancel{{/str}}</button>
+    </footer>
+</div>
+
+<!-- Topic Modal (Course Sections) -->
+<div class="ai4t-modal" id="ai4t-topic-modal" role="dialog" aria-modal="true" aria-labelledby="ai4t-topic-modal-title" style="display:none;">
+    <header>
+        <h3 id="ai4t-topic-modal-title">{{#str}}form:topiclabel, block_aipromptgen{{/str}}</h3>
+        <button type="button" id="ai4t-topic-modal-close" class="btn btn-link" aria-label="{{#str}}cancel{{/str}}">&times;</button>
+    </header>
+    <div class="ai4t-body">
+        <ul class="ai4t-list">
+            {{#topics}}
+                <li class="ai4t-item ai4t-topic-item" data-value="{{.}}" tabindex="0">{{.}}</li>
+            {{/topics}}
+        </ul>
+    </div>
+    <footer>
+        <button type="button" class="btn btn-secondary" id="ai4t-topic-modal-cancel">{{#str}}cancel{{/str}}</button>
+    </footer>
+</div>
+
+<!-- Outcomes Modal -->
+<div class="ai4t-modal" id="ai4t-outcomes-modal" role="dialog" aria-modal="true" aria-labelledby="ai4t-outcomes-modal-title" style="display:none;">
+    <header>
+        <h3 id="ai4t-outcomes-modal-title">{{#str}}form:outcomeslabel, block_aipromptgen{{/str}}</h3>
+        <button type="button" id="ai4t-outcomes-modal-close" class="btn btn-link" aria-label="{{#str}}cancel{{/str}}">&times;</button>
+    </header>
+    <div class="ai4t-body">
+        <ul class="ai4t-list">
+            {{#competencies}}
+                <li class="ai4t-item">
+                    <label style="display:flex;align-items:center;gap:8px;margin-bottom:0;cursor:pointer;">
+                        <input type="checkbox" class="ai4t-outcome-checkbox" value="{{.}}">
+                        <span>{{.}}</span>
+                    </label>
+                </li>
+            {{/competencies}}
+            {{^competencies}}
+                <li class="ai4t-item" style="color:#666;">{{#str}}none{{/str}}</li>
+            {{/competencies}}
+        </ul>
+    </div>
+    <footer>
+        <button type="button" class="btn btn-primary" id="ai4t-outcomes-modal-insert">{{#str}}add{{/str}}</button>
+        <button type="button" class="btn btn-secondary" id="ai4t-outcomes-modal-cancel">{{#str}}cancel{{/str}}</button>
+    </footer>
+</div>
+
+<!-- Language Modal -->
+<div class="ai4t-modal" id="ai4t-language-modal" role="dialog" aria-modal="true" aria-labelledby="ai4t-language-modal-title" style="display:none;">
+    <header>
+        <h3 id="ai4t-language-modal-title">{{#str}}form:language, block_aipromptgen{{/str}}</h3>
+        <button type="button" id="ai4t-language-modal-close" class="btn btn-link" aria-label="{{#str}}cancel{{/str}}">&times;</button>
+    </header>
+    <div class="ai4t-body">
+        <ul class="ai4t-list">
+            {{#languages}}
+                <li class="ai4t-item ai4t-language-item" data-code="{{code}}" data-name="{{name}}" tabindex="0">{{label}}</li>
+            {{/languages}}
+        </ul>
+    </div>
+    <footer>
+        <button type="button" class="btn btn-secondary" id="ai4t-language-modal-cancel">{{#str}}cancel{{/str}}</button>
+    </footer>
+</div>
+
+<!-- Purpose Modal -->
+<div class="ai4t-modal" id="ai4t-purpose-modal" role="dialog" aria-modal="true" aria-labelledby="ai4t-purpose-modal-title" style="display:none;">
+    <header>
+        <h3 id="ai4t-purpose-modal-title">{{#str}}form:purpose, block_aipromptgen{{/str}}</h3>
+        <button type="button" id="ai4t-purpose-modal-close" class="btn btn-link" aria-label="{{#str}}cancel{{/str}}">&times;</button>
+    </header>
+    <div class="ai4t-body">
+        <ul class="ai4t-list">
+            {{#purposes}}
+                <li class="ai4t-item ai4t-purpose-item" data-value="{{.}}" tabindex="0">{{.}}</li>
+            {{/purposes}}
+        </ul>
+    </div>
+    <footer>
+        <button type="button" class="btn btn-secondary" id="ai4t-purpose-modal-cancel">{{#str}}cancel{{/str}}</button>
+    </footer>
+</div>
+
+<!-- Audience Modal -->
+<div class="ai4t-modal" id="ai4t-audience-modal" role="dialog" aria-modal="true" aria-labelledby="ai4t-audience-modal-title" style="display:none;">
+    <header>
+        <h3 id="ai4t-audience-modal-title">{{#str}}form:audience, block_aipromptgen{{/str}}</h3>
+        <button type="button" id="ai4t-audience-modal-close" class="btn btn-link" aria-label="{{#str}}cancel{{/str}}">&times;</button>
+    </header>
+    <div class="ai4t-body">
+        <ul class="ai4t-list">
+            {{#audiences}}
+                <li class="ai4t-item ai4t-audience-item" data-value="{{.}}" tabindex="0">{{.}}</li>
+            {{/audiences}}
+        </ul>
+    </div>
+    <footer>
+        <button type="button" class="btn btn-secondary" id="ai4t-audience-modal-cancel">{{#str}}cancel{{/str}}</button>
+    </footer>
+</div>
+
+<!-- Class Type Modal -->
+<div class="ai4t-modal" id="ai4t-classtype-modal" role="dialog" aria-modal="true" aria-labelledby="ai4t-classtype-modal-title" style="display:none;">
+    <header>
+        <h3 id="ai4t-classtype-modal-title">{{#str}}form:class_typelabel, block_aipromptgen{{/str}}</h3>
+        <button type="button" id="ai4t-classtype-modal-close" class="btn btn-link" aria-label="{{#str}}cancel{{/str}}">&times;</button>
+    </header>
+    <div class="ai4t-body">
+        <ul class="ai4t-list">
+            {{#classtypes}}
+                <li class="ai4t-item ai4t-classtype-item" data-value="{{.}}" tabindex="0">{{.}}</li>
+            {{/classtypes}}
+        </ul>
+    </div>
+    <footer>
+        <button type="button" class="btn btn-secondary" id="ai4t-classtype-modal-cancel">{{#str}}cancel{{/str}}</button>
+    </footer>
+</div>
+
+<!-- AI Response Modal -->
+<div class="ai4t-modal" id="ai4t-airesponse-modal" role="dialog" aria-modal="true" aria-labelledby="ai4t-airesponse-modal-title" style="display:none;">
+    <header>
+        <h3 id="ai4t-airesponse-modal-title">{{#str}}form:response, block_aipromptgen{{/str}}</h3>
+        <button type="button" id="ai4t-airesponse-modal-close" class="btn btn-link" aria-label="{{#str}}cancel{{/str}}">&times;</button>
+    </header>
+    <div class="ai4t-body">
+        <pre id="ai4t-airesponse-body" class="form-control" style="white-space:pre-wrap;padding:12px;max-height:45vh;overflow:auto;">{{airesponse_initial}}</pre>
+        <div id="ai4t-airesponse-text" class="form-control" style="display:none;padding:12px;max-height:45vh;overflow:auto;background:#fff;font-family:monospace;white-space:pre-wrap;"></div>
+        <div id="ai4t-airesponse-html" class="form-control" style="display:none;padding:12px;max-height:45vh;overflow:auto;background:#f9f9f9;"></div>
+        <pre id="ai4t-airesponse-code" class="form-control" style="display:none;padding:12px;max-height:45vh;overflow:auto;background:#fff;font-family:monospace;white-space:pre-wrap;"></pre>
+    </div>
+    <footer>
+        <button type="button" class="btn btn-secondary ai4t-view-btn" id="ai4t-btn-raw" style="margin-right:4px;">{{#str}}view:raw, block_aipromptgen{{/str}}</button>
+        <button type="button" class="btn btn-outline-secondary ai4t-view-btn" id="ai4t-btn-text" style="margin-right:4px;">{{#str}}view:text, block_aipromptgen{{/str}}</button>
+        <button type="button" class="btn btn-outline-secondary ai4t-view-btn" id="ai4t-btn-rich" style="margin-right:4px;">{{#str}}view:html, block_aipromptgen{{/str}}</button>
+        <button type="button" class="btn btn-outline-secondary ai4t-view-btn" id="ai4t-btn-html" style="margin-right:12px;">{{#str}}view:htmlcode, block_aipromptgen{{/str}}</button>
+        <span id="ai4t-modal-copy-status" style="display:none;margin-right:12px;color:#28a745;font-weight:bold;font-size:0.9em;">Copied!</span>
+
+        <button type="button" class="btn btn-primary" id="ai4t-airesponse-modal-copy-btn" style="margin-right:8px;">{{#str}}form:copy, block_aipromptgen{{/str}}</button>
+        <button type="button" class="btn btn-secondary" id="ai4t-airesponse-modal-close-btn">{{#str}}cancel{{/str}}</button>
+    </footer>
+    <!-- Hidden element for accessibility heading of response -->
+    <h4 id="ai4t-response-heading" style="display:none;">Response</h4>
+</div>
+
+<!-- Back Button -->
+<div class="mt-3">
+    <a href="{{backurl}}" class="btn btn-secondary">{{#str}}form:backtocourse, block_aipromptgen{{/str}}</a>
+</div>

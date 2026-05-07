@@ -1,0 +1,17 @@
+# Force LF line endings for all text files
+* text=auto eol=lf
+
+# Ensure binary files are not affected by line ending conversions
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.pdf binary
+*.zip binary
+*.gz binary
+*.7z binary
+
+# Ignore large dependency directories from archives
+node_modules/ export-ignore
+vendor/ export-ignore
