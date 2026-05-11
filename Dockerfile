@@ -11,7 +11,8 @@ RUN apt-get update && apt-get install -y \
 RUN docker-php-ext-configure gd --with-jpeg \
     && docker-php-ext-install -j$(nproc) \
         gd intl mysqli pdo_mysql soap zip \
-        opcache ldap curl mbstring xsl xmlreader exif
+        opcache ldap curl mbstring dom xsl \
+    && docker-php-ext-install xmlreader exif
 
 # PHP config tuning for Moodle
 RUN echo "max_input_vars = 5000" >> /usr/local/etc/php/php.ini \
