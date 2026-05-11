@@ -8,8 +8,6 @@ RUN apt-get update && apt-get install -y \
     && rm -rf /var/lib/apt/lists/*
 
 # Install required PHP extensions for Moodle
-# No parallel flag (-j) to avoid race conditions between dom/xmlreader
-# xmlreader is bundled inside dom in PHP 8.3, no need to list it separately
 RUN docker-php-ext-configure gd --with-jpeg \
     && docker-php-ext-install \
         gd intl mysqli pdo_mysql soap zip \
@@ -21,13 +19,13 @@ RUN echo "max_input_vars = 5000" >> /usr/local/etc/php/php.ini \
     && echo "upload_max_filesize = 100M" >> /usr/local/etc/php/php.ini \
     && echo "post_max_size = 100M" >> /usr/local/etc/php/php.ini
 
+# Moodledata directory (outside webroot) - BEFORE COPY
+RUN mkdir -p /var/moodledata
+
 # Copy your fork's code
 COPY . /var/www/html/
 
-# Moodledata directory (outside webroot)
-RUN mkdir -p /var/moodledata \
-    && chown -R www-data:www-data /var/www/html /var/moodledata \
-    && chmod -R 755 /var/www/html \
-    && chmod -R 770 /var/moodledata
+# Fix ownership only - no chmod needed for local testing
+RUN chown -R www-data:www-data /var/www/html /var/moodledata
 
 EXPOSE 80
