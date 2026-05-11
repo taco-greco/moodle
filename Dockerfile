@@ -8,11 +8,12 @@ RUN apt-get update && apt-get install -y \
     && rm -rf /var/lib/apt/lists/*
 
 # Install required PHP extensions for Moodle
-# dom and xmlreader must be compiled together in PHP 8.3
+# No parallel flag (-j) to avoid race conditions between dom/xmlreader
+# xmlreader is bundled inside dom in PHP 8.3, no need to list it separately
 RUN docker-php-ext-configure gd --with-jpeg \
-    && docker-php-ext-install -j$(nproc) \
+    && docker-php-ext-install \
         gd intl mysqli pdo_mysql soap zip \
-        opcache ldap mbstring dom xml xmlreader xsl exif
+        opcache ldap mbstring dom xml xsl exif
 
 # PHP config tuning for Moodle
 RUN echo "max_input_vars = 5000" >> /usr/local/etc/php/php.ini \
